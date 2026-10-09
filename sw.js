@@ -1,6 +1,6 @@
 // Next Set service worker: makes the app work offline and picks up updates.
 // When you change index.html, bump VERSION so phones refresh their copy.
-const VERSION = 'next-set-v2';
+const VERSION = 'next-set-v3';
 const SHELL = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png', './icon-maskable-512.png'];
 
 self.addEventListener('install', e => {

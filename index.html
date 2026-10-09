@@ -837,6 +837,7 @@ function vToday(){
   const todayIdx=(new Date().getDay()+6)%7;
   const didDays=new Set(wk.map(s=>(new Date(s.date).getDay()+6)%7));
   let h='';
+  if(S.installEvt) h+=`<div class="banner"><b>Install Next Set</b><p>Add it to your home screen so it opens like a normal app and works offline.</p><div><button class="btn primary" data-act="install">Install app</button></div></div>`;
   if(!st.setup) h+=`<div class="banner"><b>Welcome.</b><p>This is a sample 3-day strength plan. Pick your sport, how many days a week you can train and how long each session can be, and the plan is rebuilt around that.</p><p class="hint">General training guidance, not medical advice. If you have an injury or a health condition, check with a doctor or physiotherapist first.</p><div><button class="btn primary" data-act="goto" data-v="plan">Set up my program</button></div></div>`;
   if(deloadDue()) h+=`<div class="banner warn"><b>Time for a lighter week?</b><p>You've trained for ${st.level==='beg'?8:6}+ weeks without one. A week with half the sets helps fatigue clear so the next block moves faster. Optional.</p><div class="rowx"><button class="btn primary small" data-act="deload">Start lighter week</button><button class="btn small ghost" data-act="snooze">Not now</button></div></div>`;
   if(deloadActive()) h+=`<div class="banner warn"><b>Lighter week in progress</b><p>Half the sets, same weights, stop well short of failure. These sessions don't count toward progression.</p><div><button class="btn small ghost" data-act="enddeload">End lighter week</button></div></div>`;
@@ -1147,6 +1148,7 @@ document.addEventListener('click',e=>{
     case 'profiles':profileSheet();break;
     case 'how':howSheet(t.dataset.v);break;
     case 'export':exportBackup();break;
+    case 'install':{const ev=S.installEvt;if(!ev) break;ev.prompt();ev.userChoice.finally(()=>{S.installEvt=null;render()});break}
     case 'useprof':{if(S.draft){toast('Finish or discard the current workout first.');break}useProfile(t.dataset.v);closeSheet();S.tab='today';render();window.scrollTo(0,0);toast(`Switched to ${curProfile().name}.`);break}
     case 'addprof':{const inp=document.getElementById('newprof');const name=(inp.value||'').trim();if(!name){inp.focus();toast('Type a name for the new profile.');break}
       if(S.draft){toast('Finish or discard the current workout first.');break}
@@ -1239,6 +1241,9 @@ function importBackup(file){
   rd.readAsText(file);
 }
 document.addEventListener('change',e=>{if(e.target.id==='importfile'&&e.target.files[0]){importBackup(e.target.files[0]);e.target.value=''}});
+
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();S.installEvt=e;if(S.st) render()});
+window.addEventListener('appinstalled',()=>{S.installEvt=null;if(S.st) render();toast('Next Set installed. Find it in your app drawer.')});
 
 /* ============ BOOT ============ */
 function boot(){
